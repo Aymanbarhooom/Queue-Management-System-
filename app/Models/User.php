@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -20,6 +21,7 @@ class User extends Authenticatable
         'password',
         'role', //'user', 'employee', 'manager', 'admin'
         'business_id',
+        'image'
     ];
 
     protected $hidden = [
@@ -82,5 +84,11 @@ class User extends Authenticatable
     public function reviews(): HasMany //user has many reviews
     {
         return $this->hasMany(Review::class);
+    }
+    protected function image(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? asset('storage/' . $value) : null,
+        );
     }
 }

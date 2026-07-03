@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->enum('role', ['user', 'employee', 'manager', 'admin'])->default('user');
+            $table->string('image');
             $table->timestamps();
             $table->softDeletes();
         });

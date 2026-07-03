@@ -20,7 +20,6 @@ class Ticket extends Model
         'status', // enum ('pending', 'canceled', 'handling', 'no_show', 'completed')
         'expected_start_time',//dateTime
         'expected_wait_min',//unsignedSmallInteger
-      //  'expected_wait_max',//unsignedSmallInteger
         'final_session_duration',
     ];
 

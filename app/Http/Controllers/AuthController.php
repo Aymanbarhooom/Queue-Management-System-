@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use App\Traits\ApiResponse;
+
 class AuthController extends Controller
 {
     use ApiResponse;
@@ -71,19 +72,32 @@ class AuthController extends Controller
     }
 
     public function updateFcmToken(Request $request)
-{
-    $request->validate([
-        'fcm_token' => 'required|string',
-    ]);
+    {
+        $request->validate([
+            'fcm_token' => 'required|string',
+        ]);
 
-    $userDevice = UserService::updateOrCreate(
-        [
-            'user_id' => auth()->id(),
-            'fcm_token' => $request->fcm_token
-        ],
-    );
+        $userDevice = UserService::updateOrCreate(
+            [
+                'user_id' => auth()->id(),
+                'fcm_token' => $request->fcm_token
+            ],
+        );
 
-    return $this->apiResponse($userDevice, 'FCM token updated successfully', 200);
-}
+        return $this->apiResponse($userDevice, 'FCM token updated successfully', 200);
+    }
+    public function updateImage(Request $request)
+    {
+        $request->validate([]);
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('profile_images', 'public');
+            $validated['image'] = $path;
+        }
 
+        $user = User::find(auth()->id());
+        $user->image = $request->image;
+        $user->save();
+
+        return $this->apiResponse($user, 'Image updated successfully', 200);
+    }
 }

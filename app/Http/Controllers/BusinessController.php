@@ -113,8 +113,11 @@ public function store(Request $request)
             'phone'=>'sometimes|string|max:20',
             'latitude'=>'nullable|numeric',
             'longitude'=>'nullable|numeric',
-            'image'=>'nullable|string'
         ]);
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('business_images', 'public');
+            $validated['image'] = $path;
+        }
 
         $business->update($data);
 

@@ -46,8 +46,11 @@ class CategoryController extends Controller
         $data = $request->validate([
             'name'=>'sometimes|string|max:100|unique:categories,name,'.$category->id,
             'description'=>'nullable|string',
-            'image'=>'nullable|string'
         ]);
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('category_images', 'public');
+            $validated['image'] = $path;
+        }
 
         $category->update($data);
 
