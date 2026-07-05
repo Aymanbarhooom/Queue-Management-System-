@@ -15,10 +15,8 @@ return new class extends Migration
                   ->comment('manager');
             $table->foreignId('category_id')
                   ->constrained('categories');
-            $table->string('name');
+            $table->string('name'); 
             $table->text('description')->nullable();
-           // $table->time('open_hour')->nullable();
-            //$table->time('close_hour')->nullable();
             $table->decimal('longitude', 10, 7);
             $table->decimal('latitude', 10, 7);
             $table->string('phone');

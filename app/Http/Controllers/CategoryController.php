@@ -24,8 +24,11 @@ class CategoryController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:100|unique:categories,name',
             'description' => 'nullable|string',
-            'image' => 'nullable|string'
         ]);
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('category_images', 'public');
+            $validated['image'] = $path;
+        }
 
         $category = Category::create($data);
 
@@ -35,7 +38,7 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        return $this->apiResponse($category, 'Category fetched successfully', 200);
+        return $this->apiResponse($category->load('businesses'), 'Category fetched successfully', 200);
     }
 
 

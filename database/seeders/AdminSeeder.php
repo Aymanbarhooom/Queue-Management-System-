@@ -15,6 +15,7 @@ class AdminSeeder extends Seeder
             'password' => Hash::make('admin123'),
             'role' => 'admin',
             'business_id' => null,
+            'image' => 'profile_images/admin.jpg',
         ]);
     }
 }

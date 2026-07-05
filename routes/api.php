@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\ServiceController;
@@ -10,8 +11,8 @@ use App\Http\Controllers\ManagerController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TicketController;
 
-Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 
 
 // ─── Authenticated ──────────────────────────────────────────────────────────── 
@@ -21,6 +22,8 @@ Route::middleware('auth:sanctum')->group(function () {
  Route::post('/logout', [AuthController::class, 'logout']);
  Route::get('/me',      [AuthController::class, 'me']);
  Route::post('/fcm_token', [AuthController::class, 'updateFcmToken']);
+
+ Route::get('/home', [HomeController::class, 'index']);
 
  // Admin Routes
  Route::apiResource('users', AdminController::class)->only(['index', 'show']);

@@ -8,12 +8,12 @@ class CategorySeeder extends Seeder
     public function run()
     {
         $categories = [
-         ['name' => 'Restaurants', 'description' => 'Food and dining', 'image' => null],
-         ['name' => 'Clothing', 'description' => 'Apparel and accessories', 'image' => null],
-         ['name' => 'Electronics', 'description' => 'Gadgets and devices', 'image' => null],
-         ['name' => 'Health', 'description' => 'Healthcare and wellness', 'image' => null],
-         ['name' => 'Education', 'description' => 'Learning and training', 'image' => null],
-         ['name' => 'Entertainment', 'description' => 'Movies, games, etc.', 'image' => null],
+         ['name' => 'بنوك', 'description' => 'Food and dining', 'image' => 'category_images/bank.jpg'],
+         ['name' => 'حكومي', 'description' => 'Apparel and accessories', 'image' => 'category_images/gov.jpg'],
+         ['name' => 'عيادات', 'description' => 'Gadgets and devices', 'image' => 'category_images/clinic.jpg'],
+         ['name' => 'تعليم', 'description' => 'Healthcare and wellness', 'image' => 'category_images/education.jpg'],
+         ['name' => 'مطاعم', 'description' => 'Learning and training', 'image' => 'category_images/food.jpg'],
+         ['name' => 'ترفيه', 'description' => 'Movies, games, etc.', 'image' => 'category_images/fun.jpg'],
          ];
         
          foreach($categories as $category) {
