@@ -72,6 +72,6 @@ Route::get('/admin/dashboard', [AdminDashboardController::class, 'index']);
 Route::post('/update-profile-image', [AuthController::class, 'updateImage']);
 Route::post('/manager/dashboard', [ManagerDashboardController::class, 'index']);
 Route::post('/update-profile', [AuthController::class, 'updateProfile']);
-
+Route::get('/services/search', [ServiceController::class, 'serviceSearch']);
 
 });

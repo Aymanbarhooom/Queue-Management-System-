@@ -16,7 +16,7 @@ class ServiceController extends Controller
         $query = Service::query();
 
         if ($user->isAdmin() || $user->isUser()) {
-            // return all services
+
         } elseif ($user->isManager()) {
             $query->whereHas('business', fn ($q) => $q->where('user_id', $user->id));
         } else {
@@ -74,5 +74,16 @@ class ServiceController extends Controller
         $this->authorize('delete',$service);
         $service->delete();
         return $this->apiResponse(null, 'Service deleted successfully', 200);
+    }
+
+    public function serviceSearch(Request $request)
+    {
+        $search = $request->get('search');
+
+        if (!empty($search)) {
+            $query = Service::where('name', 'like', '%' . $search . '%');
+        }
+
+        return $this->apiResponse($query->get(), 'Services fetched successfully', 200);
     }
 }
