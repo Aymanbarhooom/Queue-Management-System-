@@ -18,6 +18,14 @@ class BusinessSeeder extends Seeder
      */
     public function run()
     {
+        $images = [
+            'category_images/bank.jpg',
+            'category_images/gov.jpg',
+            'category_images/clinic.jpg',
+            'category_images/education.jpg',
+            'category_images/food.jpg',
+            'category_images/fun.jpg',
+        ];
         $faker = Faker::create('ar_SA'); // استخدام اللغة العربية لـ Faker لتوليد بيانات مناسبة
 
         $categories = Category::all();
@@ -32,7 +40,6 @@ class BusinessSeeder extends Seeder
         }
 
         $managerIndex = 0; // مؤشر لتتبع المدير الحالي
-
         foreach ($categories as $category) {
             for ($i = 0; $i < 4; $i++) { 
                 Business::create([
@@ -43,7 +50,7 @@ class BusinessSeeder extends Seeder
                     'longitude' => $faker->longitude($min = 34, $max = 55),
                     'latitude' => $faker->latitude($min = 16, $max = 32),
                     'phone' => $faker->phoneNumber,
-                    'image' => $category->image, 
+                    'image' => $images[$category->id - 1], 
                     'avg_rating' => $faker->randomFloat(1, 1, 5),
                 ]);
 
