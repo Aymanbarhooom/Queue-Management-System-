@@ -8,6 +8,7 @@ use Database\Seeders\AdminSeeder;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\UserSeeder;
 use Database\Seeders\ServiceSeeder;
+use Database\Seeders\QueueSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,6 +22,9 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             UserSeeder::class,
             BusinessSeeder::class,
+            EmployeeSeeder::class,
+            ServiceSeeder::class,
+            QueueSeeder::class,
         ]);
     }
 }

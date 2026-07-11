@@ -22,25 +22,22 @@ class ManagerController extends Controller {
         return $this->apiResponse($employees, 'Employees fetched successfully', 200);
     }
 
-    public function addEmployee(Request $request, Business $business) {
+    public function addEmployee(Request $request) {
         $user = $request->user();
-
-        if (!$user->isManager() || $user->id !== $business->user_id) {
-            return $this->apiResponse(null, 'This action is unauthorized.', 403);
-        }
 
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
+            'business_id' => 'required|exists:businesses,id',
         ]);
-
+        $business = Business::find($data['business_id']);
+       if (!$user->isManager() || $user->id !== $business->user_id) {
+            return $this->apiResponse(null, 'This action is unauthorized.', 403);
+        }
         $employee = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
+            ...$data,
             'role' => 'employee',
-            'business_id' => $business->id,
         ]);
         Wallet::create(['user_id' => $employee->id, 'balance' => 1000]);
         return $this->apiResponse($employee, 'Employee added successfully', 201);

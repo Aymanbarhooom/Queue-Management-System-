@@ -24,10 +24,11 @@ class CategoryController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:100|unique:categories,name',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('category_images', 'public');
-            $validated['image'] = $path;
+            $data['image'] = $path;
         }
 
         $category = Category::create($data);

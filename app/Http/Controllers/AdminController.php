@@ -16,7 +16,20 @@ class AdminController extends Controller
     public function index()
     {
         $this->authorize('viewAny', User::class);
-        $users = User::all();
+
+        $user = auth()->user();
+
+        if ($user && $user->isAdmin()) {
+            $users = User::all();
+        } elseif ($user->isManager() ) {
+            $businessIds = $user->managedBusiness()->pluck('id');
+            $users = User::where('role', 'employee')
+                ->whereIn('business_id', $businessIds)
+                ->get();
+        } else {
+            $users = collect();
+        }
+
         return $this->apiResponse($users, 'Users fetched successfully', 200);
     }
     public function show(User $user)

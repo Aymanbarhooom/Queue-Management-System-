@@ -12,7 +12,17 @@ class ServiceController extends Controller
     use ApiResponse;
     public function index()
     {
+        $user = auth()->user();
         $query = Service::query();
+
+        if ($user->isAdmin() || $user->isUser()) {
+            // return all services
+        } elseif ($user->isManager()) {
+            $query->whereHas('business', fn ($q) => $q->where('user_id', $user->id));
+        } else {
+            return $this->apiError('not authorized', 403);
+        }
+
         return $this->apiResponse($query->get(), 'Services fetched successfully', 200);
     }
 

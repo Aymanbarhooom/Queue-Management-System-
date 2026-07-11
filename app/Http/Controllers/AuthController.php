@@ -88,14 +88,16 @@ class AuthController extends Controller
     }
     public function updateImage(Request $request)
     {
-        $request->validate([]);
+        $data = $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('profile_images', 'public');
-            $validated['image'] = $path;
+            $data['image'] = $path;
         }
 
         $user = User::find(auth()->id());
-        $user->image = $request->image;
+        $user->image = $data['image'];
         $user->save();
 
         return $this->apiResponse($user, 'Image updated successfully', 200);

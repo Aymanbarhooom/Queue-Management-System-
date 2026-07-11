@@ -11,14 +11,25 @@ class UserSeeder extends Seeder
 {
     public function run()
     {
-        //6 managers
-        for($i=0; $i<6; $i++){
+        if (User::where('role', 'manager')->count() === 0) {
+            for ($i = 0; $i < 6; $i++) {
+                User::create([
+                    'name' => 'Manager '.$i,
+                    'email' => 'manager'.$i.'@gmail.com',
+                    'password' => Hash::make('password123'),
+                    'role' => 'manager',
+                    'image' => 'profile_images/manager.jpg',
+                ]);
+            }
+        }
+        //4 users for testing
+        for($i=0; $i<4; $i++){
             User::create([
-                'name' => 'Manager '.$i,
-                'email' => 'manager'.$i.'@gmail.com',
-                'password' => Hash::make('password'),
-                'role' => 'manager',
-                'image' => 'profile-images/user.jpg',
+                'name' => 'Test User '.$i,
+                'email' => 'test'.$i.'@gmail.com',
+                'password' => Hash::make('password123'),
+                'role' => 'user',
+                'image' => 'profile_images/user.jpg',
             ]);
         }
     }

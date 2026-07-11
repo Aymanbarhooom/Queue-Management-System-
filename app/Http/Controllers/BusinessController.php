@@ -57,10 +57,11 @@ public function store(Request $request)
         'phone' => 'required|string|max:20',
         'latitude' => 'nullable|numeric',
         'longitude' => 'nullable|numeric',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
     ]);
     if ($request->hasFile('image')) {
         $path = $request->file('image')->store('business_images', 'public');
-        $validated['image'] = $path;
+        $data['image'] = $path;
     }
 
     $data['user_id'] = auth()->id();
@@ -149,7 +150,7 @@ public function store(Request $request)
 
     public function topRated()
     {
-        $businesses = Business::orderBy('avg_rating', 'desc')->take(5)->get();
+        $businesses = Business::orderBy('avg_rating', 'desc')->take(3)->get();
         return $this->apiResponse($businesses, 'Businesses fetched successfully', 200);
     }
 
