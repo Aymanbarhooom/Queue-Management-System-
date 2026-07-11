@@ -79,11 +79,14 @@ class ServiceController extends Controller
     public function serviceSearch(Request $request)
     {
         $search = $request->get('search');
-
+    
+        $query = Service::query();
+    
         if (!empty($search)) {
-            $query = Service::where('name', 'like', '%' . $search . '%');
+            $query->where('name', 'like', '%' . $search . '%');
         }
-
+    
         return $this->apiResponse($query->get(), 'Services fetched successfully', 200);
     }
+    
 }
