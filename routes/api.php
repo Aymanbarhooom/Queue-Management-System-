@@ -10,6 +10,7 @@ use App\Http\Controllers\QueueController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ManagerDashboardController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TicketController;
 
@@ -74,5 +75,8 @@ Route::get('/admin/dashboard', [AdminDashboardController::class, 'index']);
 Route::post('/update-profile-image', [AuthController::class, 'updateImage']);
 Route::post('/manager/dashboard', [ManagerDashboardController::class, 'index']);
 Route::post('/update-profile', [AuthController::class, 'updateProfile']);
+
+Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead']);
+Route::get('notifications', [NotificationController::class, 'index']);
 
 });

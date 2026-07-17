@@ -24,6 +24,8 @@ return new class extends Migration
                 'booking_expired',
                 'session_completed',
             ]);
+            $table->boolean('is_read')->default(false);
+            $table->json('data')->nullable();
             $table->timestamps();
         });
     }

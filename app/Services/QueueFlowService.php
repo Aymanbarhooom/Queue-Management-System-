@@ -27,7 +27,7 @@ class QueueFlowService
                 ->findOrFail($ticket->id);
 
             $user = $ticket->user;
-
+            $token = $user->fcm_token;
 
 
             $queue = Queue::query()
@@ -124,16 +124,32 @@ class QueueFlowService
 
 
             foreach ($nextTickets as $nextTicket) {
-
+                $token = $nextTicket->user->fcm_token;
+                $title = 'اقترب موعدك';
+                $body = 'Please prepare, your turn is approaching.';
+                $data = [
+                    'ticket_id' => $ticket->id,
+                    'queue_id' => $ticket->queue_id
+                ];
+                app(FirebaseNotificationService::class)->sendPushNotification(
+                    $token,
+                    $title,
+                    $body,
+                    $data
+                );
                 Notification::create([
                     'user_id' => $nextTicket->user_id,
 
                     'type' => 'queue_near',
 
-                    'title' => 'Your turn is near',
+                    'title' => 'اقترب موعدك',
 
                     'body' =>
-                    'Please prepare, your turn is approaching.'
+                    'Please prepare, your turn is approaching.',
+                    'data'=>[
+                        'ticket_id'=>$ticket->id,
+                        'queue_id'=>$ticket->queue_id
+                    ]
                 ]);
             }
 
@@ -228,9 +244,23 @@ class QueueFlowService
             Notification::create([
                 'user_id' => $ticket->user_id,
                 'type' => 'session_completed',
-                'title' => 'Session completed',
-                'body' => 'Your service session has been completed successfully.'
+                'title' => 'انتهت الخدمة',
+                'body' => 'تم إكمال الخدمة بنجاح',
+                'data'=>[
+                    'ticket_id'=>$ticket->id,
+                    'queue_id'=>$ticket->queue_id
+                ]
             ]);
+            $token = $user->fcm_token;
+            app(FirebaseNotificationService::class)->sendPushNotification(
+                $token,
+                "انتهت الخدمة",
+                "تم إكمال الخدمة بنجاح",
+                [
+                    'ticket_id' => $ticket->id,
+                    'queue_id' => $ticket->queue_id
+                ]
+            );
 
             return $ticket->fresh([
                 'queue',
@@ -278,9 +308,23 @@ class QueueFlowService
             Notification::create([
                 'user_id' => $ticket->user_id,
                 'type' => 'booking_cancelled',
-                'title' => 'Booking cancelled',
-                'body' => 'Your booking has been cancelled successfully.'
+                'title' => 'الحجز ملغى',
+                'body' => 'تم إلغاء الحجز بنجاح',
+                'data'=>[
+                    'ticket_id'=>$ticket->id,
+                    'queue_id'=>$ticket->queue_id
+                ]
             ]);
+            $token = $user->fcm_token;
+            app(FirebaseNotificationService::class)->sendPushNotification(
+                $token,
+                "الحجز ملغى",
+                "تم إلغاء الحجز بنجاح",
+                [
+                    'ticket_id' => $ticket->id,
+                    'queue_id' => $ticket->queue_id
+                ]
+            );
 
             return $ticket->fresh([
                 'queue',
@@ -370,11 +414,25 @@ class QueueFlowService
 
                     'type' => 'moved_to_no_show',
 
-                    'title' => 'You missed your turn',
+                    'title' => 'فاتك الدور',
 
                     'body' =>
-                    'Your booking has been moved to the end of the queue.'
+                    'تم نقلك لنهاية الطابور لأنك لم تحضر على الوقت',
+                    'data'=>[
+                        'ticket_id'=>$ticket->id,
+                        'queue_id'=>$ticket->queue_id
+                    ]
                 ]);
+                $token = $user->fcm_token;
+                app(FirebaseNotificationService::class)->sendPushNotification(
+                    $token,
+                    "فاتك الدور",
+                    "تم نقلك لنهاية الطابور لأنك لم تحضر على الوقت",
+                    [
+                        'ticket_id' => $ticket->id,
+                        'queue_id' => $ticket->queue_id
+                    ]
+                );
 
 
                 return $ticket->fresh([
@@ -405,11 +463,25 @@ class QueueFlowService
 
                     'type' => 'booking_expired',
 
-                    'title' => 'Booking expired',
+                    'title' => 'تم إلغاء دورك',
 
                     'body' =>
-                    'Your booking expired because you missed your turn twice.'
+                    'تم إلغاءالحجز لأنك لم تحضر مرتين',
+                    'data'=>[
+                        'ticket_id'=>$ticket->id,
+                        'queue_id'=>$ticket->queue_id
+                    ]
                 ]);
+                $token = $user->fcm_token;
+                app(FirebaseNotificationService::class)->sendPushNotification(
+                    $token,
+                    "تم إلغاء دورك",
+                    "تم إلغاءالحجز لأنك لم تحضر مرتين",
+                    [
+                        'ticket_id' => $ticket->id,
+                        'queue_id' => $ticket->queue_id
+                    ]
+                );
 
 
                 return $ticket->fresh([

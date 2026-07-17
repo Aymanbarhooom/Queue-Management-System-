@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Category; // تأكد من المسار الصحيح لنموذج Category الخاص بك
 use App\Models\Business; // تأكد من المسار الصحيح لنموذج Business الخاص بك
+use App\Models\BusinessWorkingTime;
 use App\Models\User;     // تأكد من المسار الصحيح لنموذج User الخاص بك
 use Faker\Factory as Faker;
 
@@ -39,10 +40,20 @@ class BusinessSeeder extends Seeder
             return;
         }
 
+        $workingDays = [
+            'sunday'    => false,
+            'monday'    => false,
+            'tuesday'   => false,
+            'wednesday' => false,
+            'thursday'  => false,
+            'friday'    => false,
+            'saturday'  => false,
+        ];
+
         $managerIndex = 0; // مؤشر لتتبع المدير الحالي
         foreach ($categories as $category) {
             for ($i = 0; $i < 4; $i++) { 
-                Business::create([
+                $business = Business::create([
                     'user_id' => $managerIds[$managerIndex],
                     'category_id' => $category->id,
                     'name' => $category->name . ' - ' . 'مؤسسة ' . ($i + 1),
@@ -53,6 +64,16 @@ class BusinessSeeder extends Seeder
                     'image' => $images[$category->id - 1], 
                     'avg_rating' => $faker->randomFloat(1, 1, 5),
                 ]);
+
+                foreach ($workingDays as $day => $isClosed) {
+                    BusinessWorkingTime::create([
+                        'business_id' => $business->id,
+                        'day_of_week' => $day,
+                        'open_hour' => $isClosed ? null : '08:00',
+                        'close_hour' => $isClosed ? null : '16:00',
+                        'is_closed' => $isClosed,
+                    ]);
+                }
 
                 //move to the next manager
                 $managerIndex = ($managerIndex + 1) % count($managerIds);

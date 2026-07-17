@@ -226,11 +226,28 @@ class TicketBookingService
 
                 'type' => 'booking_confirmed',
 
-                'title' => 'Booking Confirmed',
+                'title' => 'تم الحجر بنجاح',
 
                 'body' =>
-                    'Your booking has been created successfully.'
+                    'لقد تم تأكيد حجرك بنجاح! سيصلك إشعار عند اقتراب دورك',
+                    'data'=>[
+                        'ticket_id'=>$ticket->id,
+                        'queue_id'=>$ticket->queue_id
+                    ]
             ]);
+            $token = $user->fcm_token;
+            $title = 'تم الحجر بنجاح';
+            $body = 'لقد تم تأكيد حجرك بنجاح! سيصلك إشعار عند اقتراب دورك';
+            $data = [
+                'ticket_id' => $ticket->id,
+                'queue_id' => $ticket->queue_id
+            ];
+            app(FirebaseNotificationService::class)->sendPushNotification(
+                $token,
+                $title,
+                $body,
+                $data
+            );
 
 
            
