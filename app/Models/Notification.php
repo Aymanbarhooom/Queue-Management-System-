@@ -13,6 +13,9 @@ class Notification extends Model
         'user_id',
         'title',
         'body',
+        'type',
+        'data',
+        'is_read',
     ];
 
     protected function casts(): array
@@ -20,6 +23,8 @@ class Notification extends Model
         return [
             'title' => 'string',
             'body'  => 'string',
+            'data'  => 'array',
+            'is_read' => 'boolean',
         ];
     }
 

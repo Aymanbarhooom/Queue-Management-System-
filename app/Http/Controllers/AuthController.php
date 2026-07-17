@@ -83,10 +83,8 @@ class AuthController extends Controller
         ]);
 
         $userDevice = UserService::updateOrCreate(
-            [
-                'user_id' => auth()->id(),
-                'fcm_token' => $request->fcm_token,
-            ],
+            ['user_id' => auth()->id()],
+            ['fcm_token' => $request->fcm_token],
         );
 
         return $this->apiResponse($userDevice, 'FCM token updated successfully', 200);
