@@ -3,28 +3,48 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use App\Models\Review;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReviewController extends Controller
 {
-    public function store(Request $request)
+    use ApiResponse;
+
+    public function store(Request $request, Business $business): JsonResponse
     {
-        $data = $request->validate($request, [
+        $data = $request->validate([
             'rating' => 'required|numeric|min:1|max:5',
         ]);
-        $review = Review::create([
-            'user_id' => auth()->user()->id,
-            'business_id' => $request->business_id,
-            'rating' => $data['rating'],
-        ]);
-        $business = Business::find($request->business_id);
-        $reviews = $business->reviews;
-        $avg = $reviews->avg('rating');
-        $business->avg_rating = $avg;
-        $business->save();
 
-        return $this->apiResponse($review, 'Review created successfully', 201);
+        $userId = auth()->id();
+
+        $review = DB::transaction(function () use ($business, $data, $userId) {
+            $review = Review::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'business_id' => $business->id,
+                ],
+                [
+                    'rating' => $data['rating'],
+                ]
+            );
+
+            $business->update([
+                'avg_rating' => round((float) $business->reviews()->avg('rating'), 1),
+            ]);
+
+            return $review;
+        });
+
+        $message = $review->wasRecentlyCreated
+            ? 'Review created successfully'
+            : 'Review updated successfully';
+
+        $status = $review->wasRecentlyCreated ? 201 : 200;
+
+        return $this->apiResponse($review, $message, $status);
     }
 }

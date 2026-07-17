@@ -11,6 +11,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ManagerController;
 use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TicketController;
 
@@ -78,5 +79,8 @@ Route::post('/update-profile', [AuthController::class, 'updateProfile']);
 
 Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead']);
 Route::get('notifications', [NotificationController::class, 'index']);
+
+// add an review
+ Route::post('businesses/{business}/reviews', [ReviewController::class, 'store']);
 
 });
