@@ -127,4 +127,24 @@ class AuthController extends Controller
         $user->save();
         return $this->apiResponse($user, 'User updated successfully', 200);
     }
+
+    public function updatePassword(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => ['required', 'confirmed', Password::min(8)],
+        ]);
+
+        $user = $request->user();
+
+        if (! Hash::check($data['current_password'], $user->password)) {
+            return $this->apiError('Current password is incorrect.', 422);
+        }
+
+        $user->update([
+            'password' => $data['new_password'],
+        ]);
+
+        return $this->apiResponse(null, 'Password updated successfully', 200);
+    }
 }

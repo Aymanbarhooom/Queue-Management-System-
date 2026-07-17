@@ -76,11 +76,11 @@ Route::get('/admin/dashboard', [AdminDashboardController::class, 'index']);
 Route::post('/update-profile-image', [AuthController::class, 'updateImage']);
 Route::post('/manager/dashboard', [ManagerDashboardController::class, 'index']);
 Route::post('/update-profile', [AuthController::class, 'updateProfile']);
+Route::post('/update-password', [AuthController::class, 'updatePassword']);
 
 Route::post('notifications/{notification}/mark-as-read', [NotificationController::class, 'markAsRead']);
 Route::get('notifications', [NotificationController::class, 'index']);
 
-// add an review
  Route::post('businesses/{business}/reviews', [ReviewController::class, 'store']);
 
 });
