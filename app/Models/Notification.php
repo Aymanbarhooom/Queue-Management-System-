@@ -18,15 +18,12 @@ class Notification extends Model
         'is_read',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'title' => 'string',
-            'body'  => 'string',
-            'data'  => 'array',
-            'is_read' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'title' => 'string',
+        'body'  => 'string',
+        'data'  => 'array',
+        'is_read' => 'boolean',
+    ];
 
     public function user(): BelongsTo
     {
