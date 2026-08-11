@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             EmployeeSeeder::class,
             ServiceSeeder::class,
             QueueSeeder::class,
+            WalletSeeder::class,
         ]);
     }
 }

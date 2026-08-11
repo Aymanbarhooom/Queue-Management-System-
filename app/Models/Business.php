@@ -80,4 +80,9 @@ class Business extends Model
             get: fn ($value) => $value ? asset('storage/' . $value) : null,
         );
     }
+
+    public function closeHour(): string
+    {
+        return $this->businessWorkingTime->first()->close_hour;
+    }
 }

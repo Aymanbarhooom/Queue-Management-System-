@@ -33,7 +33,7 @@ class QueueSeeder extends Seeder
             Queue::create([
                 'user_id' => $employee->id,
                 'service_id' => $service->id,
-                'name' => 'Queue - '.$employee->name,
+                'name' => 'طابور - '.$service->name,
                 'description' => $faker->sentence(),
                 'status' => 'active',
                 'type' => 'main',

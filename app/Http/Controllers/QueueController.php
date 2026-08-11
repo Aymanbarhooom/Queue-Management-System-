@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
@@ -13,14 +14,29 @@ use App\Traits\ApiResponse;
 
 class QueueController extends Controller
 {
-    use ApiResponse;        
-    use AuthorizesRequests; 
+    use ApiResponse;
+    use AuthorizesRequests;
 
     public function index()
     {
-        $this->authorize('viewAny', Queue::class);
-        $queues = Queue::all();
-       return $this->apiResponse($queues, 'Queues fetched successfully', 200);
+        $user = auth()->user();
+
+        if ($user && $user->isAdmin()) {
+            $queues = Queue::all();
+            return $this->apiResponse($queues, 'Queues fetched successfully', 200);
+        }
+
+        if ($user && $user->isManager()) {
+            // Use whereHas to traverse: queue -> service -> business
+            $queues = Queue::whereHas('service.business', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->get();
+
+            return $this->apiResponse($queues, 'Queues fetched successfully', 200);
+        }
+
+        // Default fallback for other users
+        return $this->apiResponse(null, 'No queues available', 200);
     }
 
     public function store(Request $request)
@@ -34,7 +50,7 @@ class QueueController extends Controller
             'type'        => ['required', Rule::in(['main', 'no_show'])],
         ]);
 
-       
+
         $service = Service::findOrFail($request->service_id);
         $this->authorize('create', [Queue::class, $service]);
 
@@ -48,22 +64,22 @@ class QueueController extends Controller
         $user = auth()->user();
         $this->authorize('view', $queue);
 
-        
+
         $tickets = $queue->tickets()->whereIn('status', ['pending', 'no_show'])->get();
         $totalWaitingTime = 0;
         foreach ($tickets as $ticket) {
             $totalWaitingTime += $ticket->final_session_duration;
         }
-        
+
         $totalTickets = $queue->tickets()->count();
-       
+
         $userData = array(
             'queue' => $queue,
             'service' => $queue->service,
             'totalTickets' => $totalTickets,
             'totalWaitingTime' => $totalWaitingTime
         );
-       
+
         $employeeData = array(
             'queue' => $queue,
             'service' => $queue->service,
@@ -71,9 +87,9 @@ class QueueController extends Controller
             'totalWaitingTime' => $totalWaitingTime,
             'tickets' => $tickets
         );
-        if ($user && $user->isUser()){
-        return $this->apiResponse($userData, 'Queue fetched successfully', 200);
-        }else{
+        if ($user && $user->isUser()) {
+            return $this->apiResponse($userData, 'Queue fetched successfully', 200);
+        } else {
             return $this->apiResponse($employeeData, 'Queue fetched successfully', 200);
         }
     }
@@ -107,28 +123,53 @@ class QueueController extends Controller
 
     public function updateQueueCongestion(Request $request, Queue $queue)
     {
-        $this->authorize('update', $queue);
-
+        $user = auth()->user();
+        if (!$user->isManager() && !$user->isEmployee()) {
+            return $this->apiError('not authorized', 403);
+        }
         $validated = $request->validate([
             'congestion' => 'required|string|in:low,medium,high',
         ]);
-        if ($validated['congestion'] === 'high'){
-           //send notification to last 30% of users that it is recomended to change queue
-           $tickets = $queue->tickets()->whereIn('status',['pending','no_show'])->take(ceil($queue->tickets()->count()/3))->get();
-           $users = $tickets->map(function($ticket){
-               return $ticket->user;
-           })->unique();
-           $users->each(function($user){
-               Notification::create([
-                   'user_id' => $user->id,
-                   'title' => 'Queue congestion is high',
-                   'body' => 'Queue congestion is high. It is recommended to change queue.'
-               ]);
-           });
+        if ($validated['congestion'] === 'high') {
+            //send notification to last 30% of users that it is recomended to change queue
+            $tickets = $queue->tickets()->whereIn('status', ['pending', 'no_show'])->take(ceil($queue->tickets()->count() / 3))->get();
+            $users = $tickets->map(function ($ticket) {
+                return $ticket->user;
+            })->unique();
+            $users->each(function ($user) {
+                Notification::create([
+                    'user_id' => $user->id,
+                    'title' => 'Queue congestion is high',
+                    'body' => 'Queue congestion is high. It is recommended to change queue.'
+                ]);
+            });
         }
         $queue->update([
             'congestion' => $validated['congestion'],
         ]);
         return $this->apiResponse($queue, 'Queue updated successfully', 200);
+    }
+
+    public function myQueue()
+    {
+        $user = auth()->user();
+        if (!$user || !$user->isEmployee()) {
+            return $this->apiResponse(null, 'No queues available', 200);
+        }
+
+        $queue = Queue::where('user_id', $user->id)->first();
+
+        if ($queue) {
+            // Load service normally, and apply conditions to tickets
+            $queue->load([
+                'service',
+                'tickets' => function ($query) {
+                    $query->whereIn('status', ['pending', 'handling', 'no_show'])->orderBy('number', 'asc');
+                },
+                'tickets.user' // This ensures the user relation inside tickets is still loaded
+            ]);
+        }
+
+        return $this->apiResponse($queue, 'Queue fetched successfully', 200);
     }
 }

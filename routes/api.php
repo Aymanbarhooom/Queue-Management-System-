@@ -60,6 +60,7 @@ Route::delete('managers/{business}/employees/{employee}', [ManagerController::cl
  Route::apiResource('queues', QueueController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 Route::put('queues/{queue}/tickets/{ticket}/complete', [QueueController::class, 'complete']);
 Route::put('queues/{queue}/update-congestion', [QueueController::class, 'updateQueueCongestion']);
+Route::get('my-queue', [QueueController::class, 'myQueue']);
 
 //tickets routes
 Route::post('queue/book', [TicketController::class, 'book']);

@@ -44,7 +44,7 @@ class ManagerDashboardController extends Controller
 
         foreach ($businesses as $business) {
             $queuesCount = $business->services()->withCount('queues')->get()->sum('queues_count');
-            $ticketsCount = Queue::whereIn('service_id', $business->services()->pluck('id'))->count();
+            $ticketsCount = Ticket::whereIn('queue_id', Queue::whereIn('service_id', $business->services()->pluck('id'))->pluck('id'))->count();
             $pendingTickets = Ticket::whereIn('queue_id', Queue::whereIn('service_id', $business->services()->pluck('id'))->pluck('id'))->where('status', 'pending')->count();
             $canceledTickets = Ticket::whereIn('queue_id', Queue::whereIn('service_id', $business->services()->pluck('id'))->pluck('id'))->where('status', 'canceled')->count();
             $handlingTickets = Ticket::whereIn('queue_id', Queue::whereIn('service_id', $business->services()->pluck('id'))->pluck('id'))->where('status', 'handling')->count();

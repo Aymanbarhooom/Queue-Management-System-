@@ -17,10 +17,9 @@ class FirebaseNotificationService
 
     public function __construct()
     {
-        $this->projectId = trim((string) config('services.fcm.project_id'));
-        $this->credentialsPath = $this->resolveCredentialsPath(
-            (string) config('services.fcm.credentials')
-        );
+        $this->projectId = env('FCM_PROJECT_ID');
+        $this->credentialsPath = storage_path('app/firebase-credentials.json');
+
     }
 
     public function sendToUser(User|int $user, string $title, string $body, array $data = []): bool
