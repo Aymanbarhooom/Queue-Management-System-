@@ -155,7 +155,7 @@ class QueueFlowService
                     'no_show'
                 ])
                 ->where('number', '>', $ticket->number)
-                ->where('expected_waiting_time', '<', 60)
+                ->where('expected_wait_min', '<', 60)
                 ->orderBy('number')
                 ->take(5)
                 ->get();

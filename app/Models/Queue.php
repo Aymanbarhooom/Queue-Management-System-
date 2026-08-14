@@ -58,8 +58,7 @@ class Queue extends Model
     public function pendingTickets(): HasMany
     {
         return $this->hasMany(Ticket::class)
-                    ->where('status', 'pending')
-                    ->orderBy('number');
+                    ->where('status', 'pending')->count();
     }
     public function estimatedRemainingDuration(): int
     {
@@ -67,4 +66,35 @@ class Queue extends Model
         ->whereIn('status',['pending','no_show'])
         ->sum('final_session_duration');
     }
+    // في app/Models/Queue.php
+
+protected $appends = ['pending_tickets_count', 'estimated_duration'];
+
+public function getPendingTicketsCountAttribute(): int
+{
+    // استخدام cache لتحسين الأداء إذا كنت تستدعيها كثيراً
+    return $this->tickets()
+        ->where('status', 'pending')
+        ->count();
+}
+
+public function getEstimatedDurationAttribute(): int
+{
+    return $this->tickets()
+        ->whereIn('status', ['pending', 'no_show'])
+        ->sum('final_session_duration');
+}
+
+// يمكنك أيضاً إضافة Accessor بصيغة الوقت المقروء
+public function getEstimatedDurationFormattedAttribute(): string
+{
+    $minutes = $this->estimated_duration;
+    $hours = floor($minutes / 60);
+    $remainingMinutes = $minutes % 60;
+    
+    if ($hours > 0) {
+        return "{$hours} ساعة و {$remainingMinutes} دقيقة";
+    }
+    return "{$minutes} دقيقة";
+}
 }

@@ -75,9 +75,6 @@ class QueueController extends Controller
 
         $userData = array(
             'queue' => $queue,
-            'service' => $queue->service,
-            'totalTickets' => $totalTickets,
-            'totalWaitingTime' => $totalWaitingTime
         );
 
         $employeeData = array(
