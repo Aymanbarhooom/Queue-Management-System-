@@ -118,7 +118,6 @@ class TicketController extends Controller
         );
         return $this->apiResponse($data, 'Ticket fetched successfully', 200);
     }
-    //tickets on business
     public function getBusinessTickets(Request $request, Business $business)
     {
         $this->authorize('view', $business);

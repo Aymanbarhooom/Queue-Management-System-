@@ -71,7 +71,6 @@ class CategoryController extends Controller
         return $this->apiResponse(null, 'Category deleted successfully', 200);
     }
 
-    //Get businesses on category
     public function businesses(Category $category)
     {
         $businesses = $category->businesses()

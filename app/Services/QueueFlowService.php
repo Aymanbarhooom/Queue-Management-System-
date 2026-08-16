@@ -14,14 +14,11 @@ use Illuminate\Support\Facades\DB;
    
 class QueueFlowService
 {
-    /**
-     * Recalculates expected_wait_min and expected_start_time for all unfinished tickets in the queue.
-     */
+    
     public function recalculateTimes(Queue $queue): void
     {
         $avgDuration = $queue->service->base_duration ?? 28;
 
-        // Get all active and waiting tickets ordered by queue number
         $unfinishedTickets = $queue->tickets()
             ->whereIn('status', ['handling', 'pending', 'no_show'])
             ->orderBy('number')
@@ -30,7 +27,6 @@ class QueueFlowService
         $accumulatedWait = 0;
         $now = now();
 
-        // 1. Calculate remaining time of the currently active 'handling' session, if one exists
         $handlingTicket = $unfinishedTickets->where('status', 'handling')->first();
         if ($handlingTicket) {
             $activeSession = ServiceSession::where('ticket_id', $handlingTicket->id)
@@ -40,14 +36,12 @@ class QueueFlowService
 
             if ($activeSession) {
                 $elapsed = (int) Carbon::parse($activeSession->start_time)->diffInMinutes($now);
-                // The next ticket will start after the remaining time of the current session
                 $accumulatedWait = max(0, $avgDuration - $elapsed);
             } else {
                 $accumulatedWait = $avgDuration;
             }
         }
 
-        // 2. Map and update parameters sequentially for all tickets
         foreach ($unfinishedTickets as $ticket) {
             if ($ticket->status === 'handling') {
                 $ticket->update([
@@ -57,7 +51,6 @@ class QueueFlowService
                 continue;
             }
 
-            // For pending and no_show tickets, calculate their relative wait times
             $expectedStart = $now->copy()->addMinutes($accumulatedWait);
 
             $ticket->update([
@@ -65,7 +58,6 @@ class QueueFlowService
                 'expected_start_time' => $expectedStart,
             ]);
 
-            // Add this ticket's duration to the waiting time of subsequent tickets
             $accumulatedWait += $avgDuration;
         }
     }
@@ -139,14 +131,9 @@ class QueueFlowService
                 'start_time' => now()
             ]);
 
-            // Recalculate wait times now that this ticket has moved to 'handling'
             $this->recalculateTimes($queue);
 
-            /*
-            -------------------------------------------------
-            Notify Next 3 Users
-            -------------------------------------------------
-            */
+            
             $nextTickets = $queue
                 ->tickets()
                 ->with('user')
@@ -252,7 +239,6 @@ class QueueFlowService
                 ]);
             }
 
-            // Recalculate wait times now that this ticket is out of the active queue pool
             $this->recalculateTimes($queue);
 
             $completionData = [
@@ -315,7 +301,6 @@ class QueueFlowService
                 $userStatistic->increment('total_cancellations');
             }
 
-            // Recalculate wait times since this ticket is canceled and its slot is cleared
             $this->recalculateTimes($queue);
 
             $cancelData = [
@@ -407,7 +392,6 @@ class QueueFlowService
                     'number' => ($lastNumber ?? 0) + 1
                 ]);
 
-                // Recalculate wait times because this ticket has moved to the end of the queue line
                 $this->recalculateTimes($queue);
 
                 $noShowData = [
@@ -445,7 +429,6 @@ class QueueFlowService
                     'status' => 'expired'
                 ]);
 
-                // Recalculate wait times because this ticket's turn is fully expired/canceled
                 $this->recalculateTimes($queue);
 
                 $expiredData = [

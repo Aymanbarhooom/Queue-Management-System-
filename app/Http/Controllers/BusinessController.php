@@ -66,10 +66,8 @@ public function store(Request $request)
 
     $data['user_id'] = auth()->id();
 
-    // Create the business
-    $business = Business::create($data);
+s    $business = Business::create($data);
 
-    // Define business hours for each day
     $businessHours = [
         ['day_of_week' => 'Sunday',    'open_time' => '08:00', 'close_time' => '16:00', 'is_closed' => false],
         ['day_of_week' => 'Monday',    'open_time' => '08:00', 'close_time' => '16:00', 'is_closed' => false],
@@ -96,7 +94,6 @@ public function store(Request $request)
             'category',
             'services',
             'employees',
-           // 'workingTimes'
         ]);
     
         

@@ -66,13 +66,11 @@ class Queue extends Model
         ->whereIn('status',['pending','no_show'])
         ->sum('final_session_duration');
     }
-    // في app/Models/Queue.php
 
 protected $appends = ['pending_tickets_count', 'estimated_duration'];
 
 public function getPendingTicketsCountAttribute(): int
 {
-    // استخدام cache لتحسين الأداء إذا كنت تستدعيها كثيراً
     return $this->tickets()
         ->where('status', 'pending')
         ->count();
@@ -85,7 +83,6 @@ public function getEstimatedDurationAttribute(): int
         ->sum('final_session_duration');
 }
 
-// يمكنك أيضاً إضافة Accessor بصيغة الوقت المقروء
 public function getEstimatedDurationFormattedAttribute(): string
 {
     $minutes = $this->estimated_duration;

@@ -44,44 +44,44 @@ class User extends Authenticatable
     public function isUser(): bool     { return $this->role === 'user'; }
 
 
-    public function business(): BelongsTo //employee belongs to one business
+    public function business(): BelongsTo 
     {
         return $this->belongsTo(Business::class);
     }
 
-    public function managedBusiness(): HasOne //manager manages one business
+    public function managedBusiness(): HasOne 
     {
         return $this->hasOne(Business::class, 'user_id');
     }
 
-    public function queue(): HasOne //employee has one queue
+    public function queue(): HasOne 
     {
         return $this->hasOne(Queue::class, 'user_id');
     }
 
-    public function tickets(): HasMany //user has many tickets
+    public function tickets(): HasMany 
     {
         return $this->hasMany(Ticket::class);
     }
 
-    public function wallet(): HasOne //user has one wallet
+    public function wallet(): HasOne 
     {
         return $this->hasOne(Wallet::class);
     }
 
-    public function statistics(): HasMany //user has many statistics
+    public function statistics(): HasMany
     {
         return $this->hasMany(UserStatistic::class);
     }
-    public function services(): HasMany //user has many services
+    public function services(): HasMany
     {
         return $this->hasMany(UserService::class);
     }
-    public function notifications(): HasMany //user has many notifications
+    public function notifications(): HasMany
     {
         return $this->hasMany(Notification::class);
     }
-    public function reviews(): HasMany //user has many reviews
+    public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
     }

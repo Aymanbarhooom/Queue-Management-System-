@@ -24,7 +24,6 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)],
         ]);
 
-        // Hash the password before database insertion
         $data['password'] = Hash::make($data['password']);
 
         $user = User::create([

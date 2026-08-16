@@ -27,7 +27,6 @@ class QueueController extends Controller
         }
 
         if ($user && $user->isManager()) {
-            // Use whereHas to traverse: queue -> service -> business
             $queues = Queue::whereHas('service.business', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })->get();
@@ -35,7 +34,6 @@ class QueueController extends Controller
             return $this->apiResponse($queues, 'Queues fetched successfully', 200);
         }
 
-        // Default fallback for other users
         return $this->apiResponse(null, 'No queues available', 200);
     }
 
@@ -128,7 +126,6 @@ class QueueController extends Controller
             'congestion' => 'required|string|in:low,medium,high',
         ]);
         if ($validated['congestion'] === 'high') {
-            //send notification to last 30% of users that it is recomended to change queue
             $tickets = $queue->tickets()->whereIn('status', ['pending', 'no_show'])->take(ceil($queue->tickets()->count() / 3))->get();
             $users = $tickets->map(function ($ticket) {
                 return $ticket->user;
@@ -157,13 +154,11 @@ class QueueController extends Controller
         $queue = Queue::where('user_id', $user->id)->first();
 
         if ($queue) {
-            // Load service normally, and apply conditions to tickets
             $queue->load([
                 'service',
                 'tickets' => function ($query) {
                     $query->whereIn('status', ['pending', 'handling', 'no_show'])->orderBy('number', 'asc');
                 },
-                'tickets.user' // This ensures the user relation inside tickets is still loaded
             ]);
         }
 
