@@ -66,7 +66,7 @@ public function store(Request $request)
 
     $data['user_id'] = auth()->id();
 
-s    $business = Business::create($data);
+    $business = Business::create($data);
 
     $businessHours = [
         ['day_of_week' => 'Sunday',    'open_time' => '08:00', 'close_time' => '16:00', 'is_closed' => false],

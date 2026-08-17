@@ -63,7 +63,7 @@ class QueueController extends Controller
         $this->authorize('view', $queue);
 
 
-        $tickets = $queue->tickets()->whereIn('status', ['pending', 'no_show'])->get();
+        $tickets = $queue->tickets()->whereIn('status', ['pending', 'no_show'])->get()->load('user');
         $totalWaitingTime = 0;
         foreach ($tickets as $ticket) {
             $totalWaitingTime += $ticket->final_session_duration;
@@ -157,7 +157,9 @@ class QueueController extends Controller
             $queue->load([
                 'service',
                 'tickets' => function ($query) {
-                    $query->whereIn('status', ['pending', 'handling', 'no_show'])->orderBy('number', 'asc');
+                    $query->whereIn('status', ['pending', 'handling', 'no_show'])
+                        ->orderBy('number', 'asc')
+                        ->with('user');
                 },
             ]);
         }
